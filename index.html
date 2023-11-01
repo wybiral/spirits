@@ -71,7 +71,7 @@ window.onload = () => {
         }
         const length = points.length;
         const target = 100;
-        if (length == target) {
+        if (length >= target) {
             generateWord();
             points.splice(0, length);
             return;
