@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <title>Spirits</title>
+        <style>
+html, body {
+    padding: 0;
+    margin: 0;
+    background: #111;
+}
+body {
+    text-align: center;
+}
+h1 {
+    color: #f70;
+    margin: 1em auto;
+}
+h1.empty {
+    color: rgba(255, 255, 255, 0.25);
+}
+#progress {
+    position: relative;
+    background: #666;
+    height: 13px;
+    width: 333px;
+    margin: 0 auto;
+}
+
+#progress > div {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 0%;
+    background: #f70;
+}
+
+#movement {
+    background: #000;
+    width: 333px;
+    height: 333px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+#movement > div {
+    color: rgba(255, 255, 255, 0.25);
+    padding: 2em 1em;
+    text-align: left;
+    user-select: none;
+}
+
+        </style>
+    <script src="words.js"></script>
+    <script>
+let points = [];
+
+window.onload = () => {
+    const movement = document.querySelector('#movement');
+    movement.onmousemove = evt => {
+        const point = [evt.offsetX, evt.offsetY];
+        if (points.length == 0) {
+            points.push(point);
+        } else {
+            const lastPoint = points[points.length - 1];
+            const dx = point[0] - lastPoint[0];
+            const dy = point[1] - lastPoint[1];
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d >= 13) {
+                points.push(point);
+            }
+        }
+        const length = points.length;
+        const target = 100;
+        if (length == target) {
+            generateWord();
+            points.splice(0, length);
+            return;
+        }
+        const progress = length / target;
+        document.querySelector('#progress > div').style.width = (progress * 100).toFixed(2) + '%';
+    };
+};
+
+function generateWord() {
+    let seed = 0;
+    points.forEach(point => {
+        seed ^= (point[0] * point[1]);
+    });
+    const el = document.querySelector('#word');
+    el.className = '';
+    el.innerText = WORDS[seed % WORDS.length].toUpperCase();
+}
+
+    </script>
+    </head>
+    <body>
+        <h1 id="word" class="empty">...</h1>
+        <div id="progress"><div></div></div>
+        <div id="movement">
+            <div>
+                Concentrate on your question while moving the cursor around in
+                this box until the entropy bar is filled.
+            </div>
+        </div>
+    </body>
+</html>
