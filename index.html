@@ -55,6 +55,7 @@ h1.empty {
 let points = [];
 
 window.onload = () => {
+    voices = speechSynthesis.getVoices();
     const movement = document.querySelector('#movement');
     movement.onmousemove = evt => {
         const point = [evt.offsetX, evt.offsetY];
@@ -65,12 +66,12 @@ window.onload = () => {
             const dx = point[0] - lastPoint[0];
             const dy = point[1] - lastPoint[1];
             const d = Math.sqrt(dx * dx + dy * dy);
-            if (d >= 13) {
+            if (d >= 31) {
                 points.push(point);
             }
         }
         const length = points.length;
-        const target = 100;
+        const target = 23;
         if (length >= target) {
             generateWord();
             points.splice(0, length);
@@ -81,14 +82,31 @@ window.onload = () => {
     };
 };
 
-function generateWord() {
-    let seed = 0;
+let index = 13;
+async function generateWord() {
     points.forEach(point => {
-        seed ^= (point[0] * point[1]);
+        index = (index * point[0] + point[1]) % WORDS.length;
     });
     const el = document.querySelector('#word');
     el.className = '';
-    el.innerText = WORDS[seed % WORDS.length].toUpperCase();
+    el.innerText = WORDS[index].toUpperCase();
+    await say(WORDS[index]);
+}
+
+let voices;
+let lastUtterance;
+function say(msg) {
+    voices = speechSynthesis.getVoices();
+    return new Promise((resolve, reject) => {
+        lastUtterance = new SpeechSynthesisUtterance(msg);
+        lastUtterance.rate = Math.random() * 0.6 + 0.3;
+        lastUtterance.pitch = Math.random() * 2.0;
+        if (voices && voices.length) {
+            lastUtterance.voice = voices[Math.random() * voices.length | 0];
+        }
+        lastUtterance.onend = resolve;
+        setTimeout(() => speechSynthesis.speak(lastUtterance), 100);
+    });
 }
 
     </script>
