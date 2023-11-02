@@ -88,11 +88,9 @@ async function generateWord() {
         index = (index * point[0] + point[1]) % WORDS.length;
     });
     const el = document.querySelector('#word');
-    el.className = 'empty';
-    el.innerText = '...';
-    await say(WORDS[index]);
     el.className = '';
     el.innerText = WORDS[index].toUpperCase();
+    await say(WORDS[index]);
 }
 
 let voices;
